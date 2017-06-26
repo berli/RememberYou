@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 2.6)
-projcet(RememberYou)
+project(RememberYou)
 
 # The version number.
 set(RememberYou_VERSION_MAJOR 1)
@@ -9,8 +9,7 @@ find_package( OpenCV REQUIRED )
 
 # configure a header file to pass some of the CMake settings
 # to the source code
-configure_file 
-(
+configure_file (
     "${PROJECT_SOURCE_DIR}/RememberYouConfig.h.in"
     "${PROJECT_BINARY_DIR}/RememberConfig.h"
 )
@@ -24,5 +23,9 @@ include_directories ("${PROJECT_SOURCE_DIR}/dlib")
 add_subdirectory (Dlib) 
 
 # add the executable
-add_executable(RememberYou tutorial.cxx)
+
+# 查找当前目录下的所有源文件
+# 并将名称保存到 DIR_SRCS 变量
+aux_source_directory(. DIR_SRCS)
+add_executable(RememberYou ${DIR_SRCS})
 target_link_libraries (RememberYou Dlib)
