@@ -5,6 +5,8 @@ projcet(RememberYou)
 set(RememberYou_VERSION_MAJOR 1)
 set(RememberYou_VERSION_MINOR 0)
 
+find_package( OpenCV REQUIRED )
+
 # configure a header file to pass some of the CMake settings
 # to the source code
 configure_file 
