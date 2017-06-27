@@ -11,7 +11,7 @@ find_package( OpenCV REQUIRED )
 # to the source code
 configure_file (
     "${PROJECT_SOURCE_DIR}/RememberYouConfig.h.in"
-    "${PROJECT_BINARY_DIR}/RememberConfig.h"
+    "${PROJECT_BINARY_DIR}/RememberYouConfig.h"
 )
 
 # add the binary tree to the search path for include files
