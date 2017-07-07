@@ -45,8 +45,8 @@ int main(int argc, char*argv[])
 
     return 0;
     Caffe_Predefine();
-    Mat lena = imread(argv[1]);
-    Mat test = imread(argv[2]);
+    //Mat lena = imread(argv[1]);
+    //Mat test = imread(argv[2]);
 
     imshow("lean", lena);
     resize(lena, lena, Size(224, 224));
