@@ -51,14 +51,14 @@ void SaveFaceMatrix(float *FaceMatrix[], string filename,int rows)
 //存储姓名
 void SaveNameVector(vector<string>   &NameVector, string filename){
     int Num = 0;
-    ofstream NameSaveFile(filename, ios::app);
+    ofstream NameSaveFile(filename.c_str(), ios::app);
     while (Num < NameVector.size())
         NameSaveFile << NameVector[Num++] << endl;
     NameSaveFile.clear();
 }
 vector<string> LoadNameVector(vector<string>   &NameVector_, string filename)
 {
-    ifstream in(filename);
+    ifstream in(filename.c_str());
     int Num = 0;
     string line;
     if (in){

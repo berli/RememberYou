@@ -2,10 +2,11 @@
 #include <FaceDetect.h>
 #include <ComputeDistance.h>
 #include <ExtractFeature_.h>
+#include <ExtractFeature.h>
 
 float* Register::MatToVector_(Mat TrainMat)
 {
-    Mat TrainMat_ROI = Facedetect(TrainMat);
+    Mat TrainMat_ROI = FaceDetect(TrainMat);
     if (!TrainMat_ROI.empty())
         return ExtractFeature_(TrainMat_ROI);
     else return NULL;

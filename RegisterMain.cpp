@@ -2,6 +2,7 @@
 #include <FaceDetect.h>
 #include <ExtractFeature_.h>
 
+#ifdef REGISTER
 int main()
 {
     Caffe_Predefine();
@@ -20,3 +21,6 @@ int main()
     imshow("lena.jpg",lena);
     waitKey(0);
 }
+
+#endif
+

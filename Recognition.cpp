@@ -1,9 +1,16 @@
+
+#include "Recognition.h"
+#include "SaveVector.h"
+#include "FaceDetect.h"
+#include "ExtractFeature.h"
+#include "ComputeDistance.h"
+
 void Recognition::LoadVector(string FaceSpace) // save the people's  face vector
 {
     string FaceVectorRoad = "data/" + FaceSpace + "_FaceMatrix.xml";
     string NameVectorRoad = "data/" + FaceSpace + "_NameVector.txt";
     vector<vector<float> >  FaceVector;
-    FaceVector = LoadFaceMatrix(FaceVectorRoad);
+    //FaceVector = LoadFaceMatrix(FaceVectorRoad);
     NameVector=LoadNameVector(NameVector, NameVectorRoad);
     if (!FaceVector.empty() && !NameVector.empty())
     {
@@ -43,7 +50,7 @@ string Recognition::Predict(Mat LoadGetFace)//可优化，using CUDA TO COMPUTE
 
 }
 
-void Recognition::LoadRecognitionModel(vector<vector<float>> FaceMatrix, vector<string> NameVector_)//创建识别模型，需要输入FaceMarix，NameVector.
+void Recognition::LoadRecognitionModel(vector<vector<float> > FaceMatrix, vector<string> NameVector_)//创建识别模型，需要输入FaceMarix，NameVector.
 {
     if (!FaceMatrix.empty() &&!NameVector_.empty())
     {
@@ -58,12 +65,12 @@ void Recognition::LoadRecognitionModel(vector<vector<float>> FaceMatrix, vector<
 
 void Recognition::clear()
 {
-    FaceMatrix_ = NULL;
+    //FaceMatrix_ = NULL;
     NameVector.clear();
 }
 
-void Recognition::update(vector<vector<float>> FaceMatrix, vector<string> NameVector)
+void Recognition::update(vector<vector<float> > FaceMatrix, vector<string> NameVector)
 {
-    clear_();
+    //clear_();
     LoadRecognitionModel(FaceMat, NameVector);
 }

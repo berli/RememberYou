@@ -1,4 +1,6 @@
 #include <ComputeDistance.h>
+#include <ExtractFeature_.h>
+#include <YotoFace.h>
 using namespace std;
 
 #define CUBLAS 0
@@ -28,11 +30,25 @@ float cosine(const vector<float>& v1, const vector<float>& v2)
    return dotProduct(v1, v2) / (module(v1) * module(v2));
 }
 
-int main()
-{
+
+int main(int argc, char*argv[])
+{  
+    SingleFace face;
+    YotoFace Yoto;
+    Mat lena = imread(argv[1]);
+    Mat test = imread(argv[2]);
+    Yoto.Recognition(lena, face);
+    imshow("LENA", lena);
+    imshow("TEST", test);
+    waitKey(0);
+
+
+    return 0;
     Caffe_Predefine();
-    Mat lena = imread("lena.jpg");
-    Mat test = imread("test.jpg");
+    Mat lena = imread(argv[1]);
+    Mat test = imread(argv[2]);
+
+    imshow("lean", lena);
     resize(lena, lena, Size(224, 224));
     resize(test, test, Size(224, 224));
     if (!lena.empty()&&!test.empty())
@@ -45,9 +61,14 @@ int main()
         t2 = clock();
         cout << "计算耗时" << t2 - t1 << "ms" << endl;
     }
-    imshow("LENA", lena);
-    imshow("TEST", test);
-    waitKey(0);
+    else
+    {
+      cout<<"File is not exist"<<endl;
+      return -1;
+    }
+
+    return 0;
+}
 #if CUBLAS
 int main()
 {
@@ -77,4 +98,3 @@ int main()
     cin.get();
 }
 #endif //CUBLAS
-}

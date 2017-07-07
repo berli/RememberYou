@@ -2,7 +2,6 @@
 
 int gauss(float x[], float y[], int length, float sigma);
 Mat gaussianfilter(Mat img, double sigma0, double sigma1, double shift1, double shift2);
-Mat FaceProcessing(const Mat &img_, double gamma = 0.2, double sigma0 = 1, double sigma1 = -2, double mask = 0, double do_norm = 10);
 
 //找出矩阵中的最大值或最小值，输入MAX，或MIN
 double MatMaxMin(Mat im, String flag = "MAX")

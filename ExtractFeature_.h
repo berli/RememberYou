@@ -1,6 +1,7 @@
 #ifndef EXTRACT_FEATURE_H_H
 #define EXTRACT_FEATURE_H_H
-#include <opencv.hpp>
+#include <opencv2/opencv.hpp>
+#include <boost/shared_ptr.hpp>
 using namespace cv;
 using namespace std;
 

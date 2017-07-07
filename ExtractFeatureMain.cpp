@@ -1,4 +1,6 @@
 #include <ExtractFeature_.h>
+
+#ifdef EXTRACT
 int main()
 {
     Caffe_Predefine();
@@ -15,4 +17,5 @@ int main()
     imshow("Extract feature",lena);
     waitKey(0);
 }
+#endif
 
