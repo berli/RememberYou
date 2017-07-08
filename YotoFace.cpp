@@ -1,0 +1,235 @@
+#include <YotoFace.h>
+#include"FaceProcessing.h"
+#include"Utils.h"
+
+namespace caffe
+{
+    extern INSTANTIATE_CLASS(InputLayer);
+    extern INSTANTIATE_CLASS(InnerProductLayer);
+    extern INSTANTIATE_CLASS(DropoutLayer);
+    //extern INSTANTIATE_CLASS(ConvolutionLayer);
+    //REGISTER_LAYER_CLASS(Convolution);
+    //extern INSTANTIATE_CLASS(ReLULayer);
+    //REGISTER_LAYER_CLASS(ReLU);
+    //extern INSTANTIATE_CLASS(PoolingLayer);
+    //REGISTER_LAYER_CLASS(Pooling);
+    //extern INSTANTIATE_CLASS(LRNLayer);
+    //REGISTER_LAYER_CLASS(LRN);
+    //extern INSTANTIATE_CLASS(SoftmaxLayer);
+    //REGISTER_LAYER_CLASS(Softmax);
+    //extern INSTANTIATE_CLASS(MemoryDataLayer);
+}
+
+//构造
+YotoFace::YotoFace()
+{
+    net = new caffe::Net<float>("vgg_face_caffe/vgg_extract_feature_memorydata.prototxt", caffe::TEST);
+    net->CopyTrainedLayersFrom("vgg_face_caffe/VGG_FACE.caffemodel");
+    memory_layer = (caffe::MemoryDataLayer<float> *)net->layers()[0].get();
+    
+    dlib::deserialize("vgg_face_caffe/shape_predictor_68_face_landmarks.dat") >> sp;//读入标记点文件
+}
+
+//提取特征
+vector<float> YotoFace::ExtractFeature(Mat img_224) //ensure input 224*224!!!
+{
+    std::vector<Mat> test{ img_224 };
+    std::vector<int> testLabel{ 0 };
+    memory_layer->AddMatVector(test, testLabel);// memory_layer and net , must be define be a global variable.
+    vector<caffe::Blob<float>*> input_vec;
+    net->Forward(input_vec);
+    auto fc7 = net->blob_by_name("fc7");//提取fc7层！4096维特征
+    float* begin = fc7->mutable_cpu_data();
+    vector<float> feature{ begin, begin + fc7->channels() };
+    //cout << fc7->channels();
+    return move(feature);
+}
+
+bool YotoFace::FaceDetect(const Mat& aImg, vector<Mat>&vecFaces, vector<cv::Rect> &vecRect)
+{
+     // Turn OpenCV's Mat into something dlib can deal with.  Note that this just
+     // wraps the Mat object, it doesn't copy anything.  So cimg is only valid as
+     // long as temp is valid.  Also don't do anything to temp that would cause it
+     // to reallocate the memory which stores the image as that will make cimg
+     // contain dangling pointers.  This basically means you shouldn't modify temp
+     // while using cimg.
+     dlib::cv_image<dlib::bgr_pixel> lImg(aImg);
+     dlib::frontal_face_detector detector = dlib::get_frontal_face_detector();
+     // Detect faces 
+     std::vector<dlib::rectangle> faces = detector(lImg);
+     // Find the pose of each face.
+     std::vector<dlib::full_object_detection> shapes;
+
+    Mat gray,error;
+    cvtColor(aImg, gray, CV_BGR2GRAY);
+    
+    cout<<"detect faces:"<<faces.size()<<endl;
+    for (unsigned long i = 0; i < faces.size(); ++i)
+    {
+        dlib::full_object_detection shape = sp(dlib::cv_image<uchar>(gray), faces[i]);//标记点
+        std::vector<dlib::full_object_detection> shapes;
+        shapes.push_back(shape);//把点保存在了shape中
+        dlib::array<dlib::array2d<dlib::rgb_pixel>>  face_chips;
+        dlib::extract_image_chips(dlib::cv_image<uchar>(gray), dlib::get_face_chip_details(shapes), face_chips);
+        Mat pic = dlib::toMat(face_chips[0]);
+        //cvtColor(pic, pic, CV_BGR2GRAY);
+        resize(pic, pic, Size(224, 224));
+    
+	imshow("detect face", pic);
+	waitKey(10);
+        vecFaces.push_back(FaceProcessing(pic));
+	vecRect.push_back(dlibRectangleToOpenCV(faces[i]));
+
+    }
+    if(faces.size() > 0 )
+	return true;
+    return false;//如果没有检测出人脸 将返回一个空矩阵
+}
+
+//单张图片生成SingleFace
+bool YotoFace::Generate(Mat input)
+{
+    SingleFace singleface;
+    vector<Rect> roi;
+    vector<Mat> img_224;
+    if (FaceDetect(input,img_224, roi))
+    {
+        //resize(img_224, img_224, Size(224, 224));
+        auto feature_=ExtractFeature(img_224[0]);
+
+        if (feature_.empty())
+            return false;
+        else
+        {
+            singleface.sourceImage = input;
+            singleface.position = roi[0];
+            singleface.feature = feature_;
+            singleface.Roi_224 = img_224[0];
+        
+	    FaceArray.push_back(singleface);
+            return true;
+        }
+    }
+    else
+    {
+        return false;
+    }
+}
+
+//有标签的数据
+bool YotoFace::Generate(Mat input, SingleFace &singleface,string label_)
+{
+    vector<Rect> roi;
+    if (label_.empty())
+        return false;
+    vector<Mat> vecImg;
+    if (FaceDetect(input, vecImg, roi))
+    {
+        Mat img_224 = input(roi[0]);
+        resize(img_224, img_224, Size(224, 224));
+        auto feature_ = ExtractFeature(img_224);
+
+        if (feature_.empty())
+            return false;
+        else
+        {
+            singleface.sourceImage = input;
+            singleface.position = roi[0];
+            singleface.feature = feature_;
+            singleface.Roi_224 = img_224;
+            singleface.label = label_;
+            return true;
+        }
+    }
+    else
+    {
+        return false;
+    }
+}
+
+void YotoFace::drawFaceImage(Mat input)
+{
+    vector<Rect> rec;
+    vector<Mat> img_224;
+    if (FaceDetect(input, img_224, rec))
+    {
+        //有人脸
+        Mat draw = input;
+        rectangle(draw, rec[0], Scalar(0, 0, 255), 2);
+    }
+
+}
+
+inline double LikeValue(float *v1, float *v2, int channels)
+{
+    //计算内积：
+    double mult = 0;
+    double v1_2 = 0;
+    double v2_2 = 0;
+    for (int i = 0; i < channels; i++)
+    {
+        mult += v1[i] * v2[i];
+        v1_2 += pow(v1[i], 2);
+        v2_2 += pow(v2[i], 2);
+    }
+
+    return mult / (sqrt(v1_2)*sqrt(v2_2));
+}
+
+
+int YotoFace::Compare(const Mat &img1, const Mat& img2 )
+{
+    //解析：
+    if (!Generate(img1))
+    {
+    }
+    if (!Generate(img2))
+    {
+    }
+
+    int size = FaceArray.size();//有多少个人脸需要对比的
+    if(size != 2)
+       return -1;
+    int single_channel = FaceArray[0].feature.size();
+    int single_channel1 = FaceArray[1].feature.size();
+    assert(single_channel == single_channel);
+    float *faces_feature1 = &FaceArray[0].feature[0];
+    float *faces_feature2 = &FaceArray[1].feature[0];
+    float cos = LikeValue(faces_feature1, faces_feature2, single_channel);
+
+    cout << "余弦距离为：" << cos << endl;
+    
+    return 0;
+}
+
+SingleFace YotoFace::Recognition(Mat input_, SingleFace &singleface)
+{
+    //解析：
+    if (Generate(input_))
+    {
+        float *single_feature = &singleface.feature[0];
+        int single_channel = singleface.feature.size();
+
+        int size_ = FaceArray.size();//有多少个人脸需要对比的
+        vector<double> like_array;
+        for (int i = 0; i < size_; i++)
+        {
+            float *faces_feature = &FaceArray[i].feature[0];
+            like_array.push_back(LikeValue(single_feature, faces_feature, single_channel));
+        }
+
+        vector<double>::iterator biggest = std::max_element(std::begin(like_array), std::end(like_array));
+        int max_ = distance(std::begin(like_array), biggest);
+        cout << "余弦距离为：" << max_ << endl;
+
+        return FaceArray[max_];
+
+    }
+
+    else
+    {
+        return singleface;
+    }
+
+}
+
