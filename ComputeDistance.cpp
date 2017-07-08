@@ -33,22 +33,20 @@ float cosine(const vector<float>& v1, const vector<float>& v2)
 
 int main(int argc, char*argv[])
 {  
-    SingleFace face;
-    YotoFace Yoto;
+    Caffe_Predefine();
     Mat lena = imread(argv[1]);
     Mat test = imread(argv[2]);
-    Yoto.Recognition(lena, face);
-    imshow("LENA", lena);
-    imshow("TEST", test);
-    waitKey(0);
-
-
-    return 0;
-    Caffe_Predefine();
     //Mat lena = imread(argv[1]);
     //Mat test = imread(argv[2]);
+    cout<<"YotoFace..."<<endl;
+    YotoFace Yoto;
+    Yoto.Compare(lena, test);
+    //imshow("LENA", lena);
+    //imshow("TEST", test);
+    //waitKey(0);
+    return 0;
 
-    imshow("lean", lena);
+    cout<<"no detect and align======================="<<endl;
     resize(lena, lena, Size(224, 224));
     resize(test, test, Size(224, 224));
     if (!lena.empty()&&!test.empty())
