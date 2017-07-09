@@ -40,12 +40,15 @@ int main(int argc, char*argv[])
     //Mat test = imread(argv[2]);
     cout<<"YotoFace..."<<endl;
     YotoFace Yoto;
+    clock_t t1, t2;
+    t1 = clock();
     Yoto.Compare(lena, test);
+    cout << "计算耗时" << clock() - t1 << "ms" << endl;
     //imshow("LENA", lena);
     //imshow("TEST", test);
     //waitKey(0);
-    return 0;
 
+    return 0;
     cout<<"no detect and align======================="<<endl;
     resize(lena, lena, Size(224, 224));
     resize(test, test, Size(224, 224));
@@ -53,7 +56,6 @@ int main(int argc, char*argv[])
     {
         vector<float> lena_vector = ExtractFeature(lena);
         vector<float> test_vector = ExtractFeature(test);
-        clock_t t1, t2;
         t1 = clock();
         cout << "余弦距离为：" << cosine(lena_vector, test_vector) << endl;
         t2 = clock();

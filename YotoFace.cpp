@@ -77,7 +77,8 @@ bool YotoFace::FaceDetect(const Mat& aImg, vector<Mat>&vecFaces, vector<cv::Rect
     
 	imshow("detect face", pic);
 	waitKey(10);
-        vecFaces.push_back(FaceProcessing(pic));
+        //vecFaces.push_back(FaceProcessing(pic));
+        vecFaces.push_back(pic);
 	vecRect.push_back(dlibRectangleToOpenCV(faces[i]));
 
     }
