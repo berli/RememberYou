@@ -23,11 +23,11 @@ namespace caffe
 //构造
 YotoFace::YotoFace()
 {
-    net = new caffe::Net<float>("vgg_face_caffe/vgg_extract_feature_memorydata.prototxt", caffe::TEST);
-    net->CopyTrainedLayersFrom("vgg_face_caffe/VGG_FACE.caffemodel");
+    net = new caffe::Net<float>("model/vgg_extract_feature_memorydata.prototxt", caffe::TEST);
+    net->CopyTrainedLayersFrom("model/VGG_FACE.caffemodel");
     memory_layer = (caffe::MemoryDataLayer<float> *)net->layers()[0].get();
     
-    dlib::deserialize("vgg_face_caffe/shape_predictor_68_face_landmarks.dat") >> sp;//读入标记点文件
+    dlib::deserialize("model/shape_predictor_68_face_landmarks.dat") >> sp;//读入标记点文件
 }
 
 //提取特征
