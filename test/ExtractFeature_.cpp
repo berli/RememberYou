@@ -20,8 +20,8 @@ namespace caffe
 template <typename Dtype>
 caffe::Net<Dtype>* Net_Init_Load(std::string param_file, std::string pretrained_param_file, caffe::Phase phase)
 {
-    caffe::Net<Dtype>* net(new caffe::Net<Dtype>("vgg_face_caffe/vgg_extract_feature_memorydata.prototxt", caffe::TEST));
-    net->CopyTrainedLayersFrom("vgg_face_caffe/VGG_FACE.caffemodel");
+    caffe::Net<Dtype>* net(new caffe::Net<Dtype>("model/vgg_extract_feature_memorydata.prototxt", caffe::TEST));
+    net->CopyTrainedLayersFrom("model/VGG_FACE.caffemodel");
     return net;
 }
 
@@ -35,7 +35,7 @@ void Caffe_Predefine()//when our code begining run must add it
 //  caffe::set_mode(Caffe::GPU);
 #endif
 //    caffe::Caffe::set_mode(caffe::Caffe::GPU);
-    net = Net_Init_Load<float>("vgg_face_caffe/vgg_extract_feature_memorydata.prototxt", "vgg_face_caffe/VGG_FACE.caffemodel", caffe::TEST);
+    net = Net_Init_Load<float>("model/vgg_extract_feature_memorydata.prototxt", "vgg_face_caffe/VGG_FACE.caffemodel", caffe::TEST);
     memory_layer = (caffe::MemoryDataLayer<float> *)net->layers()[0].get();
 }
 
