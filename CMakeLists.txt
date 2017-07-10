@@ -13,6 +13,9 @@ set(RememberYou_VERSION_MAJOR 1)
 set(RememberYou_VERSION_MINOR 0)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2")
 
+ADD_DEFINITIONS(-DCPU_ONLY)
+ADD_DEFINITIONS(-DUSE_OPENCV)
+
 if (USE_SSE)
     add_definitions(-DUSE_SSE)
     message(STATUS "Use SSE")
