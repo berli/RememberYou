@@ -26,7 +26,7 @@ public:
     YotoFace();
     vector<float> ExtractFeature(Mat input_224);//提取特征
     bool Generate(Mat input);//没有label的情况下进行的Generate，表示的是识别
-    bool Generate(Mat input, SingleFace &singleface, string label);//有label的情况下进行的Generate，表示的是注册
+    bool Generate(const Mat& input, vector<SingleFace> &vecFace);
    int Compare(const Mat &img1, const Mat& img2 );
 
     SingleFace Recognition(Mat input_224, SingleFace &singleface);//输入一个224*224的图片，查找他属于哪个人

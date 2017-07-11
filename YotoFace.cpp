@@ -90,26 +90,26 @@ bool YotoFace::FaceDetect(const Mat& aImg, vector<Mat>&vecFaces, vector<cv::Rect
 //单张图片生成SingleFace
 bool YotoFace::Generate(Mat input)
 {
-    SingleFace singleface;
-    vector<Rect> roi;
-    vector<Mat> img_224;
-    if (FaceDetect(input,img_224, roi))
+    vector<Rect> vecRoi;
+    vector<Mat> vecImg224;
+    if (FaceDetect(input,vecImg224, vecRoi))
     {
-        //resize(img_224, img_224, Size(224, 224));
-        auto feature_=ExtractFeature(img_224[0]);
-
-        if (feature_.empty())
-            return false;
-        else
-        {
-            singleface.sourceImage = input;
-            singleface.position = roi[0];
-            singleface.feature = feature_;
-            singleface.Roi_224 = img_224[0];
-        
-	    FaceArray.push_back(singleface);
-            return true;
-        }
+        int i = 0;
+        for(auto img:vecImg224)
+	{
+            SingleFace singleface;
+            //resize(img_224, img_224, Size(224, 224));
+            auto feature=ExtractFeature(img);
+            if (!feature.empty())
+            {
+                singleface.sourceImage = input;
+                singleface.position = vecRoi[i++];
+                singleface.feature = feature;
+                singleface.roi224 = img;
+            
+                FaceArray.push_back(singleface);
+            }
+	}
     }
     else
     {
@@ -117,30 +117,30 @@ bool YotoFace::Generate(Mat input)
     }
 }
 
-//有标签的数据
-bool YotoFace::Generate(Mat input, SingleFace &singleface,string label_)
+bool YotoFace::Generate(const Mat& input, vector<SingleFace> &vecFace)
 {
-    vector<Rect> roi;
-    if (label_.empty())
-        return false;
-    vector<Mat> vecImg;
-    if (FaceDetect(input, vecImg, roi))
+    vector<Rect> vecRoi;
+    vector<Mat> vecImg224;
+    if (FaceDetect(input,vecImg224, vecRoi))
     {
-        Mat img_224 = input(roi[0]);
-        resize(img_224, img_224, Size(224, 224));
-        auto feature_ = ExtractFeature(img_224);
-
-        if (feature_.empty())
-            return false;
-        else
-        {
-            singleface.sourceImage = input;
-            singleface.position = roi[0];
-            singleface.feature = feature_;
-            singleface.Roi_224 = img_224;
-            singleface.label = label_;
-            return true;
-        }
+        int i = 0;
+        for(auto img:vecImg224)
+	{
+            SingleFace singleface;
+            //resize(img_224, img_224, Size(224, 224));
+            auto feature=ExtractFeature(img);
+            if (!feature.empty())
+            {
+                singleface.sourceImage = input;
+                singleface.position = vecRoi[i++];
+                singleface.feature = feature;
+                singleface.roi224 = img;
+            
+                vecFace.push_back(singleface);
+            }
+	}
+	if(vecFace.size()>0)
+	   return true;
     }
     else
     {
@@ -181,24 +181,29 @@ inline double LikeValue(float *v1, float *v2, int channels)
 int YotoFace::Compare(const Mat &img1, const Mat& img2 )
 {
     //解析：
-    if (!Generate(img1))
+    vector<SingleFace> vecFace1;
+    vector<SingleFace> vecFace2;
+    if (!Generate(img1, vecFace1))
     {
     }
-    if (!Generate(img2))
+    if (!Generate(img2, vecFace2))
     {
     }
 
-    int size = FaceArray.size();//有多少个人脸需要对比的
-    if(size != 2)
-       return -1;
-    int single_channel = FaceArray[0].feature.size();
-    int single_channel1 = FaceArray[1].feature.size();
+    for(auto face1:vecFace1)
+    {
+        for(auto face2:vecFace2)
+	{
+    int single_channel = face1.feature.size();
+    int single_channel1 = face2.feature.size();
     assert(single_channel == single_channel);
-    float *faces_feature1 = &FaceArray[0].feature[0];
-    float *faces_feature2 = &FaceArray[1].feature[0];
+    float *faces_feature1 = &face1.feature[0];
+    float *faces_feature2 = &face2.feature[0];
     float cos = LikeValue(faces_feature1, faces_feature2, single_channel);
 
     cout << "余弦距离为：" << cos << endl;
+	}
+    }
     
     return 0;
 }
