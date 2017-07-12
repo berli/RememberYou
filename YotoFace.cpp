@@ -226,7 +226,7 @@ SingleFace YotoFace::Recognition(Mat input_, SingleFace &singleface)
 
         vector<double>::iterator biggest = std::max_element(std::begin(like_array), std::end(like_array));
         int max_ = distance(std::begin(like_array), biggest);
-        cout << "余弦距离为：" << max_ << endl;
+        LOG(INFO) << "余弦距离为cosine：" << max_ << endl;
 
         return FaceArray[max_];
 
