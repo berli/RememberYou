@@ -32,18 +32,22 @@ float cosine(const vector<float>& v1, const vector<float>& v2)
 
 int main(int argc, char*argv[])
 {  
+    FLAGS_log_dir = "./";
+    google::InitGoogleLogging(argv[0]);
+
     Mat lena = imread(argv[1]);
     Mat test = imread(argv[2]);
-    cout<<"YotoFace..."<<endl;
+    LOG(INFO)<<"YotoFace..."<<endl;
     YotoFace Yoto;
     clock_t t1, t2;
     t1 = clock();
     Yoto.Compare(lena, test);
-    cout << "计算耗时" << clock() - t1 << "ms" << endl;
+    LOG(INFO) << "计算耗时" << clock() - t1 << "ms" << endl;
     //imshow("LENA", lena);
     //imshow("TEST", test);
     //waitKey(0);
 
+    google::ShutdownGoogleLogging();
 
     return 0;
 }

@@ -117,9 +117,8 @@ bool YotoFace::Generate(Mat input)
     }
 }
 
-bool YotoFace::Generate(const Mat& input, vector<SingleFace> &vecFace)
+bool YotoFace::Generate(const Mat& input, vector<Rect>&vecRoi, vector<SingleFace> &vecFace)
 {
-    vector<Rect> vecRoi;
     vector<Mat> vecImg224;
     if (FaceDetect(input,vecImg224, vecRoi))
     {
@@ -148,25 +147,20 @@ bool YotoFace::Generate(const Mat& input, vector<SingleFace> &vecFace)
     }
 }
 
-void YotoFace::drawFaceImage(Mat input)
+void YotoFace::drawFaceImage(const Mat& input, vector<Rect>&vecRec, Mat&draw)
 {
-    vector<Rect> rec;
-    vector<Mat> img_224;
-    if (FaceDetect(input, img_224, rec))
-    {
-        //有人脸
-        Mat draw = input;
-        rectangle(draw, rec[0], Scalar(0, 0, 255), 2);
-    }
-
+     for(auto&rec:vecRec)
+     {
+        rectangle(draw, rec, Scalar(0, 0, 255), 2);
+     }
 }
 
 inline double LikeValue(float *v1, float *v2, int channels)
 {
     //计算内积：
-    double mult = 0;
-    double v1_2 = 0;
-    double v2_2 = 0;
+    register double mult = 0;
+    register double v1_2 = 0;
+    register double v2_2 = 0;
     for (int i = 0; i < channels; i++)
     {
         mult += v1[i] * v2[i];
@@ -183,10 +177,14 @@ int YotoFace::Compare(const Mat &img1, const Mat& img2 )
     //解析：
     vector<SingleFace> vecFace1;
     vector<SingleFace> vecFace2;
-    if (!Generate(img1, vecFace1))
+    vector<Rect>vecRect1;
+    vector<Rect>vecRect2;
+    if (Generate(img1, vecRect1,vecFace1))
     {
+       Mat draw;
+       drawFaceImage(img1, vecRec1, draw);
     }
-    if (!Generate(img2, vecFace2))
+    if (Generate(img2, vecRect2, vecFace2))
     {
     }
 
@@ -194,14 +192,14 @@ int YotoFace::Compare(const Mat &img1, const Mat& img2 )
     {
         for(auto face2:vecFace2)
 	{
-    int single_channel = face1.feature.size();
-    int single_channel1 = face2.feature.size();
-    assert(single_channel == single_channel);
-    float *faces_feature1 = &face1.feature[0];
-    float *faces_feature2 = &face2.feature[0];
-    float cos = LikeValue(faces_feature1, faces_feature2, single_channel);
+            int single_channel = face1.feature.size();
+            int single_channel1 = face2.feature.size();
+            assert(single_channel == single_channel);
+            float *faces_feature1 = &face1.feature[0];
+            float *faces_feature2 = &face2.feature[0];
+            float cos = LikeValue(faces_feature1, faces_feature2, single_channel);
 
-    cout << "余弦距离为：" << cos << endl;
+            LOG(INFO)<< "余弦距离为：" << cos << endl;
 	}
     }
     
