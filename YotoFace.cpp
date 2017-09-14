@@ -182,7 +182,7 @@ int YotoFace::Compare(const Mat &img1, const Mat& img2 )
     if (Generate(img1, vecRect1,vecFace1))
     {
        Mat draw;
-       drawFaceImage(img1, vecRec1, draw);
+       drawFaceImage(img1, vecRect1, draw);
     }
     if (Generate(img2, vecRect2, vecFace2))
     {

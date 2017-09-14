@@ -33,7 +33,7 @@ float cosine(const vector<float>& v1, const vector<float>& v2)
 int main(int argc, char*argv[])
 {  
     FLAGS_log_dir = "./";
-    google::InitGoogleLogging(argv[0]);
+//    google::InitGoogleLogging(argv[0]);
 
     Mat lena = imread(argv[1]);
     Mat test = imread(argv[2]);
@@ -47,7 +47,7 @@ int main(int argc, char*argv[])
     //imshow("TEST", test);
     //waitKey(0);
 
-    google::ShutdownGoogleLogging();
+//    google::ShutdownGoogleLogging();
 
     return 0;
 }
