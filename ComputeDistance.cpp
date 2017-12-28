@@ -29,6 +29,13 @@ float cosine(const vector<float>& v1, const vector<float>& v2)
    return dotProduct(v1, v2) / (module(v1) * module(v2));
 }
 
+long getMillSeconds()
+{
+    struct timeval tv;
+    gettimeofday(&tv, NULL); 
+
+    return 1000*tv.tv_sec+tv.tv_usec/1000;
+}
 
 int main(int argc, char*argv[])
 {  
@@ -39,10 +46,10 @@ int main(int argc, char*argv[])
     Mat test = imread(argv[2]);
     LOG(INFO)<<"YotoFace..."<<endl;
     YotoFace Yoto;
-    clock_t t1, t2;
-    t1 = clock();
+    
+    long s = getMillSeconds();
     Yoto.Compare(lena, test);
-    LOG(INFO) << "计算耗时" << clock() - t1 << "ms" << endl;
+    LOG(INFO) << "计算耗时" << getMillSeconds()-s << " ms" << endl;
     //imshow("LENA", lena);
     //imshow("TEST", test);
     //waitKey(0);
