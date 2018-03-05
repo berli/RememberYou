@@ -45,7 +45,7 @@ find_package( Caffe REQUIRED )
 if (NOT Caffe_FOUND)
     message(WARNING "Caffe not found. ")
  else()
-    include_directories("/usr/local/include/caffe/" )
+    include_directories(${Caffe_INCLUDE_DIRS})
 endif()
 # add the binary tree to the search path for include files
 # so that we will find RememberYouConfig.h
